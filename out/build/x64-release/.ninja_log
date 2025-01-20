@@ -1,0 +1,5 @@
+# ninja log v6
+6	586	7578255602213661	CMakeFiles/CMakeTarget.dir/main.cc.obj	9cfed9af8c341211
+587	719	7578255608025706	CMakeTarget.exe	a1be8f42455ffe3b
+34	860	7587453365015976	CMakeFiles/basicRayTracing.dir/main.cc.obj	ea09bc87116152cb
+861	975	7587453373438538	basicRayTracing.exe	79fe9f752c453716
