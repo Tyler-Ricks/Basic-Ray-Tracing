@@ -16,7 +16,7 @@ endif()
 
 project(basicRayTracing)
 
-add_executable(basicRayTracing main.cc "vec3.h" "color.h" "ray.h" "hittable.h" "sphere.h" "hittable_list.h" "rtweekend.h" "interval.h" "camera.h" "material.h" "tes.h")
+add_executable(basicRayTracing main.cc "vec3.h" "color.h" "ray.h" "hittable.h" "sphere.h" "hittable_list.h" "rtweekend.h" "interval.h" "camera.h" "material.h" "tes.h" "aabb.h" "bvh.h" "texture.h" "rtw_stb_image.h" "external" "perlin.h" "quad.h" "constant_medium.h")
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET basicRayTracing PROPERTY CXX_STANDARD 20)

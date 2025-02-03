@@ -10,6 +10,8 @@ public:
     int image_width = 800;  // Rendered image width in pixel count
     int samples_per_pixel = 500;
     int max_depth = 10;
+    color bg1 = color(0.0);
+    color bg2 = bg1;
 
     double vfov = 90; //vertical view angle
     point3 lookfrom = point3(0, 0, 0);   // Point camera is looking from
@@ -33,7 +35,7 @@ public:
                     ray r = get_ray(i, j);
                     pixel_color += ray_color(r, max_depth, world);
                 }
-                write_color(std::cout, pixel_samples_scale * pixel_color);
+                write_color(std::cout, pixel_samples_scale * pixel_color); //averages sample colors
             }
         }
 
@@ -100,8 +102,9 @@ private:
 
         auto ray_origin = (defocus_angle <= 0) ? center : defocus_disk_sample();
         vec3 ray_direction = pixel_sample - ray_origin;
+        auto ray_time = random_double();
 
-        return ray(ray_origin, ray_direction);
+        return ray(ray_origin, ray_direction, ray_time);
     }
 
     vec3 sample_square() const {
@@ -121,7 +124,24 @@ private:
 
         hit_record rec;
 
-        if (world.hit(r, interval(0.001, infinity), rec)) {
+        if (!world.hit(r, interval(0.001, infinity), rec)) {
+            vec3 unit_direction = unit_vector(r.direction());
+            auto a = 0.5 * (unit_direction.y() + 1.0); //uniform color gradient
+            return ((1.0 - a) * bg1) + (a * bg2);  
+        }
+
+        ray scattered;
+        color attenuation;
+        color color_from_emission = rec.mat->emitted(rec.u, rec.v, rec.p);
+
+        if (!rec.mat->scatter(r, rec, attenuation, scattered))
+            return color_from_emission;
+
+        color color_from_scatter = attenuation * ray_color(scattered, depth - 1, world);
+
+        return color_from_emission + color_from_scatter;
+
+        /*if (world.hit(r, interval(0.001, infinity), rec)) {
             ray scattered;
             color attenuation;
             if (rec.mat->scatter(r, rec, attenuation, scattered))
@@ -133,23 +153,25 @@ private:
 
         vec3 unit_direction = unit_vector(r.direction());
         //orange to blue across x
-        /*auto a = 0.5 * (unit_direction.x() + 1.0);
-        return (1.0 - a) * color(1.0, 0.35, 0.25) + a * color(0, 0, 1);*/
-        /*auto a = 0.5 * (unit_direction.x() + 1.0);
-        return (1.0 - a) * color(0.775, 0.0, 0.376) + a * color(0.47, 1.0, 0.79);*/
+        //auto a = 0.5 * (unit_direction.z() + 1.0);
+        //return (1.0 - a) * color(1.0, 0.35, 0.25) + a * color(0, 0, 1);
+
+        //watermelon
+        //auto a = 0.5 * (unit_direction.z() + 1.0);
+        //return (1.0 - a) * color(0.775, 0.0, 0.376) + a * color(0.47, 1.0, 0.79);
+
         //white to blue across y
-        /*auto a = 0.5 * (unit_direction.y() + 1.0);
-        return (1.0 - a) * color(1.0, 1.0, 1.0) + a * color(0.5, 0.7, 1.0);*/
+        auto a = 0.5 * (unit_direction.y() + 1.0);
+        return (1.0 - a) * color(1.0, 1.0, 1.0) + a * color(0.5, 0.7, 1.0);
         
-        //return (1.0 - a) * color(1.0,1.0,1.0) + a * color(0.0, 0.0, 0.0);
-        //return(color(0.0, 0.0, 0.0));
         //spooky
-        auto a = 0.5 * (unit_direction.z() + 1.0);
+        //auto a = 0.5 * (unit_direction.z() + 1.0);
         //return (1.0 - a) * color(0.56, 0.85, 0.676) + (a) * color(0.0, 0.0, 0.0); //light
-        return (1.0 - a) * color(1.0) + (a) * color(0.0, 0.0, 0.0); //light
+        //return (1.0 - a) * color(1.0) + (a) * color(0.0, 0.0, 0.0); //light
+
         //return (0.85 - a) * color(0.56, 0.85, 0.676) + a * color(0.0, 0.0, 0.0); //dark
-        /*auto a = 0.5 * (unit_direction.x() + 1.0);
-        return (1.0 - a) * color(0.7, 0.584, 1.0) + a * color(1.0, 0.28, 0.69);*/
+        //auto a = 0.5 * (unit_direction.x() + 1.0);
+        //return (1.0 - a) * color(0.7, 0.584, 1.0) + a * color(1.0, 0.28, 0.69);*/
     }
 };
 

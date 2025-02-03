@@ -13,9 +13,10 @@
   },
   "ExpandedNodes": [
     "",
-    "\\out",
-    "\\out\\build"
+    "\\external",
+    "\\images",
+    "\\Scenes"
   ],
-  "SelectedNode": "\\main.cc",
+  "SelectedNode": "\\sphere.h",
   "PreviewInSolutionExplorer": false
 }
