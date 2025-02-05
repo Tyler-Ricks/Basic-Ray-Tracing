@@ -305,27 +305,53 @@ void test() {
     //hittable_list world;
 
     //initialize camera
-    camera cam;
-    cam.aspect_ratio = 16.0 / 9.0;
-    cam.image_width = 400;
-    cam.samples_per_pixel = 50;
-    cam.max_depth = 20;
 
-    cam.vfov = 90;
-    //cam.lookfrom = point3(0, 1, -1);
-    cam.lookfrom = point3(0, 1.0, -2.0);
-    cam.lookat = point3(0, 1.0, 0);
-    cam.vup = vec3(0, 1, 0);
-    cam.bg1 = color(0.70, 0.80, 1.00);
+    auto per1 = make_shared<noise_texture>(0.5);
+    world.add(make_shared<sphere>(point3(0, -1000, 0), 1000, make_shared<metal>(color(0.5), per1)));
+    //world.add(make_shared<sphere>(point3(0, -1000, 0), 1000, make_shared<lambertian>(per1)));
+    //world.add(make_shared<sphere>(point3(0, -1000, 0), 1000, make_shared<lambertian>(color(1.0))));
+    //world.add(make_shared<sphere>(point3(0, 1, 1), 1, make_shared<lambertian>(color(1.0, 0.0, 0.0))));
+    //world.add(make_shared<sphere>(point3(-2, 1, 1), 1, make_shared<dielectric>(1.5, color(1.0, 0.84, 1.0))));
+    //world.add(make_shared<sphere>(point3(-2, 1, 1), 0.9, make_shared<dielectric>(1 / 1.5, color(1.0, 0.84, 1.0))));
+    //world.add(make_shared<sphere>(point3(2, 1, 1), 1, make_shared<metal>(color(0.8), 0.1)));
 
-    auto checker = make_shared<checker_texture>(0.32, color(.2, .3, .1), color(.9, .9, .9));
-    world.add(make_shared<sphere>(point3(0, -1000, 0), 1000, make_shared<lambertian>(checker)));
+    auto per = make_shared<noise_texture>(20.0);
+    auto perlinglass = make_shared<dielectric>(color(0.75, 0.635, 1.0), per);
+    world.add(make_shared<sphere>(point3(0, 1, 4.5), 1, perlinglass));
+    //world.add(make_shared<sphere>(point3(0, 1, 0), 1, make_shared<lambertian>(color(1.0, 0.0, 0.0))));
+    //world.add(make_shared<sphere>(point3(0, 1, 4.5), 1, make_shared<lambertian>(color(1.0, 0.0, 0.0))));  
 
-    auto checker_metal = make_shared<checker_texture>(0.25, color(0.25), color(0.75));
-    //auto checker_metal_part = make_shared<metal>(checker_metal, 0.1);
-    world.add(make_shared<sphere>(point3(0, 1.0, 0.0), 1.0, make_shared<metal>(checker_metal, 0.25)));
+    //world.add(make_shared<sphere>(point3(-3, 1, 0), 1, make_shared<metal>(per, per)));
+
+    //world.add(make_shared<sphere>(point3(0, 0.2, 1.3), 0.2, make_shared<lambertian>(color(0.0, 1.0, 0.0))));
+    //world.add(make_shared<sphere>(point3(-0.4, 0.2, 1.3), 0.2, make_shared<lambertian>(color(1.0, 0.0, 0.0))));
+    //world.add(make_shared<sphere>(point3(0.4, 0.2, 1.3), 0.2, make_shared<lambertian>(color(0.0, 0.0, 1.0))));
+
+    //world.add(make_shared<sphere>(point3(0, 1, 0), 0.1, make_shared<diffuse_light>(make_shared<image_texture>("rainbow1.jpg", 20.0))));
+
+    world.add(make_shared<quad>(point3(-1, 3.5, 4), vec3(2, 0, 0), vec3(0, 0, 2), make_shared<diffuse_light>(color(10.0))));
+    
 
     world = hittable_list(make_shared<bvh_node>(world));
+
+    camera cam;
+
+    cam.aspect_ratio = 16.0 / 9.0;
+    cam.image_width = 800;
+    cam.samples_per_pixel = 5000;
+    cam.max_depth = 50;
+    //cam.bg1 = color(1.0);
+    //cam.bg2 = cam.bg1;
+
+    cam.vfov = 70;
+    //cam.lookfrom = point3(13, 3, 4);
+    cam.lookfrom = point3(0, 2, 1.5);
+    cam.lookat = point3(0, 1, 3.5);
+    cam.vup = vec3(0, 1, 0);
+
+    cam.defocus_angle = 0.6;
+    cam.focus_dist = (cam.lookfrom - cam.lookat).length();
+
     cam.render(world);
 }
 //case 5
@@ -1218,7 +1244,7 @@ int main() {
 
     cam.render(world);*/
 
-    switch (13) {
+    switch (4) {
         case 1:  spooky_render(); break;
         case 2:  scatter_spheres(); break;
         case 3:  full_render(); break;

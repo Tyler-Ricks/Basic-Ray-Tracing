@@ -21,7 +21,6 @@ public:
 
 class lambertian : public material {
 public:
-    //lambertian(const color& albedo) : albedo(albedo) {}
     lambertian(const color& albedo) : tex(make_shared<solid_color>(albedo)) {}
     lambertian(shared_ptr<texture> tex) : tex(tex) {}
 
@@ -39,43 +38,70 @@ public:
     }
 
 private:
-    //color albedo;
-    //double scatter_prob = 1.0;
     shared_ptr<texture> tex;
 };
 
 class metal : public material {
 public:
-    //metal(const color& albedo, double fuzz) : albedo(albedo), fuzz(fuzz < 1 ? fuzz : 1) {}
-    metal(const color& albedo, double fuzz) : tex(make_shared<solid_color>(albedo)), fuzz(fuzz < 1 ? fuzz : 1) {}
-    metal(shared_ptr<texture> tex, double fuzz) : tex(tex), fuzz(fuzz < 1 ? fuzz : 1) {}
+    metal(const color& albedo, double fuzz) : 
+        tex(make_shared<solid_color>(albedo)), 
+        spec_map(fuzz < 1 ? make_shared<solid_color>(color(fuzz)) : make_shared<solid_color>(color(1.0))) {}
+    metal(shared_ptr<texture> tex, double fuzz) : 
+        tex(tex), 
+        spec_map(fuzz < 1 ? make_shared<solid_color>(color(fuzz)) : make_shared<solid_color>(color(1.0))) { }
+    metal(const color& albedo, shared_ptr<texture> map) : 
+        tex(make_shared<solid_color>(albedo)), 
+        spec_map(map) {} 
+    metal(shared_ptr<texture> tex, shared_ptr<texture> map) : 
+        tex(tex),
+        spec_map(map) {}
 
     bool scatter(const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered)
         const override {
+        attenuation = tex->value(rec.u, rec.v, rec.p);
+        double spec = 1.0 - spec_map->value(rec.u, rec.v, rec.p).x(); //higher value -> more shiny
+
         vec3 reflected = reflect(r_in.direction(), rec.normal);
-        reflected = unit_vector(reflected) + (fuzz * random_unit_vector());
+        //reflected = unit_vector(reflected) + (fuzz * spec * random_unit_vector());
+        reflected = unit_vector(reflected) + (spec * random_unit_vector());
+        //reflected = unit_vector(reflected) + ((1.0 - attenuation.x()) * random_unit_vector());
         scattered = ray(rec.p, reflected, r_in.time());
         //attenuation = albedo;
-        attenuation = tex->value(rec.u, rec.v, rec.p);
+        //attenuation = tex->value(rec.u, rec.v, rec.p);
         return (dot(scattered.direction(), rec.normal) > 0);
     }
 
 private:
-    //color albedo;
-    double fuzz;
     shared_ptr<texture> tex;
+    shared_ptr<texture> spec_map;
 };
 
 class dielectric : public material {
-public:
-    dielectric(double refraction_index) : refraction_index(refraction_index), tex(make_shared<solid_color>(color(1.0))) {}
-    dielectric(double refraction_index, color tint) : refraction_index(refraction_index), tex(make_shared<solid_color>(tint)) {}
-    dielectric(double refraction_index, shared_ptr<texture> tex) : refraction_index(refraction_index), tex(tex) {}
+public: //replace refraction_index with map
+    dielectric(double refraction_index) : 
+        refract_map(make_shared<solid_color>(color(refraction_index))), 
+        tex(make_shared<solid_color>(color(1.0))){}
+    dielectric(double refraction_index, const color& tint) :
+        refract_map(make_shared<solid_color>(color(refraction_index))),
+        tex(make_shared<solid_color>(tint)) {}
+    dielectric(double refraction_index, shared_ptr<texture> tex) :
+        refract_map(make_shared<solid_color>(color(refraction_index))),
+        tex(tex) {}
+    dielectric(const color& tint, shared_ptr<texture> map) :
+        refract_map(map),
+        tex(make_shared<solid_color>(color(tint))){ }
+    dielectric(shared_ptr<texture> tex, shared_ptr<texture> map) :
+        refract_map(map),
+        tex(tex){ }
 
     bool scatter(const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered)
         const override {
         attenuation = tex->value(rec.u, rec.v, rec.p);
+        vec3 refract_mapping = refract_map->value(rec.u, rec.v, rec.p);
+        double refraction_index = refract_mapping.x() == 0.0 ? 0.0001: 2 * refract_mapping.x();
+
         double ri = rec.front_face ? (1.0 / refraction_index) : refraction_index;
+        //double ri = rec.front_face ? (1.0 / test) : test;
 
         vec3 unit_direction = unit_vector(r_in.direction());
         double cos_theta = std::fmin(dot(-unit_direction, rec.normal), 1.0);
@@ -94,10 +120,7 @@ public:
     }
 
 private:
-    // Refractive index in vacuum or air, or the ratio of the material's refractive index over
-    // the refractive index of the enclosing media
-    double refraction_index;
-    //color tint;
+    shared_ptr<texture> refract_map; //take in grayscale textures
     shared_ptr<texture> tex;
 
     static double reflectance(double cosine, double refraction_index) {
