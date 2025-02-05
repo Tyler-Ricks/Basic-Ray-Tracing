@@ -1,3 +1,5 @@
+//[_Ray Tracing in One Weekend_](https://raytracing.github.io/books/RayTracingInOneWeekend.html)
+
 #ifndef VEC3_H
 #define VEC3_H
 

@@ -307,7 +307,7 @@ void test() {
     //initialize camera
 
     auto per1 = make_shared<noise_texture>(0.5);
-    world.add(make_shared<sphere>(point3(0, -1000, 0), 1000, make_shared<metal>(color(0.5), per1)));
+    world.add(make_shared<sphere>(point3(0, -1000, 0), 1000, make_shared<metal>(color(0.35), per1)));
     //world.add(make_shared<sphere>(point3(0, -1000, 0), 1000, make_shared<lambertian>(per1)));
     //world.add(make_shared<sphere>(point3(0, -1000, 0), 1000, make_shared<lambertian>(color(1.0))));
     //world.add(make_shared<sphere>(point3(0, 1, 1), 1, make_shared<lambertian>(color(1.0, 0.0, 0.0))));
@@ -316,7 +316,8 @@ void test() {
     //world.add(make_shared<sphere>(point3(2, 1, 1), 1, make_shared<metal>(color(0.8), 0.1)));
 
     auto per = make_shared<noise_texture>(20.0);
-    auto perlinglass = make_shared<dielectric>(color(0.75, 0.635, 1.0), per);
+    //auto perlinglass = make_shared<dielectric>(color(0.75, 0.635, 1.0), per);
+    auto perlinglass = make_shared<dielectric>(color(1.0), per);
     world.add(make_shared<sphere>(point3(0, 1, 4.5), 1, perlinglass));
     //world.add(make_shared<sphere>(point3(0, 1, 0), 1, make_shared<lambertian>(color(1.0, 0.0, 0.0))));
     //world.add(make_shared<sphere>(point3(0, 1, 4.5), 1, make_shared<lambertian>(color(1.0, 0.0, 0.0))));  
@@ -327,7 +328,7 @@ void test() {
     //world.add(make_shared<sphere>(point3(-0.4, 0.2, 1.3), 0.2, make_shared<lambertian>(color(1.0, 0.0, 0.0))));
     //world.add(make_shared<sphere>(point3(0.4, 0.2, 1.3), 0.2, make_shared<lambertian>(color(0.0, 0.0, 1.0))));
 
-    //world.add(make_shared<sphere>(point3(0, 1, 0), 0.1, make_shared<diffuse_light>(make_shared<image_texture>("rainbow1.jpg", 20.0))));
+    world.add(make_shared<sphere>(point3(0, 1, 4.5), 0.2, make_shared<diffuse_light>(make_shared<image_texture>("rainbow1.jpg", 20.0))));
 
     world.add(make_shared<quad>(point3(-1, 3.5, 4), vec3(2, 0, 0), vec3(0, 0, 2), make_shared<diffuse_light>(color(10.0))));
     
@@ -340,8 +341,9 @@ void test() {
     cam.image_width = 800;
     cam.samples_per_pixel = 5000;
     cam.max_depth = 50;
-    //cam.bg1 = color(1.0);
+    cam.bg1 = color(1.0);
     //cam.bg2 = cam.bg1;
+    cam.bg2 = color(0.70, 0.80, 1.00);
 
     cam.vfov = 70;
     //cam.lookfrom = point3(13, 3, 4);

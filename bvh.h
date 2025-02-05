@@ -1,3 +1,5 @@
+//[_Ray Tracing in One Weekend_](https://raytracing.github.io/books/RayTracingInOneWeekend.html)
+
 #ifndef BVH_H
 #define BVH_H
 

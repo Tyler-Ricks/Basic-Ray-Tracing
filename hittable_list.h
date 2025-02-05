@@ -1,3 +1,5 @@
+//[_Ray Tracing in One Weekend_](https://raytracing.github.io/books/RayTracingInOneWeekend.html)
+
 #ifndef HITTABLE_LIST_H
 #define HITTABLE_LIST_H
 

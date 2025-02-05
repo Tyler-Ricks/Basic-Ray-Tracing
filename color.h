@@ -1,3 +1,5 @@
+//[_Ray Tracing in One Weekend_](https://raytracing.github.io/books/RayTracingInOneWeekend.html)
+
 #ifndef COLOR_H
 #define COLOR_H
 

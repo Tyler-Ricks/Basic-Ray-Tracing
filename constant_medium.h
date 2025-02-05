@@ -1,3 +1,5 @@
+//[_Ray Tracing in One Weekend_](https://raytracing.github.io/books/RayTracingInOneWeekend.html)
+
 #ifndef CONSTANT_MEDIUM_H
 #define CONSTANT_MEDIUM_H
 

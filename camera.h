@@ -1,3 +1,5 @@
+//[_Ray Tracing in One Weekend_](https://raytracing.github.io/books/RayTracingInOneWeekend.html)
+
 #ifndef CAMERA_H
 #define CAMERA_H
 
@@ -38,8 +40,8 @@ public:
                 write_color(std::cout, pixel_samples_scale * pixel_color); //averages sample colors
             }
         }
-
-        std::clog << "\rDone.                 \n";
+                     //"ScanLines remaining: ___"
+        std::clog << "\rDone.                       \n";
     }
 
 private:
